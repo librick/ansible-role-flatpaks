@@ -32,7 +32,7 @@ See: https://github.com/pre-commit/pre-commit
       vars_files:
         - vars/main.yml
       roles:
-        - librick.flatpak
+        - librick.flatpaks
 
 *Inside `vars/main.yml`*:
 
