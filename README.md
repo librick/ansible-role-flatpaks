@@ -3,7 +3,8 @@
 
 This role installs and customizes flatpaks on Debian-based Linux systems. It:
  - Ensures that flatpak is installed
- - Ensures that flatpak packages are installed
+ - Ensures that flatpak packages are installed system-wide
+ - Ensures that flatpak packages are installed locally for a provided user
  - Ensures that flatpak packages are configured
 
 ## Role Variables
