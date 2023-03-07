@@ -1,0 +1,58 @@
+---
+# molecule.yml is the central configuration entrypoint for Molecule.
+# With this file, you can configure each tool that Molecule will employ when testing your role.
+# See: https://molecule.readthedocs.io/en/latest/getting-started/#the-scenario-layout
+role_name_check: 1
+dependency:
+  name: galaxy
+
+driver:
+  # Use the Molecule Vagrant driver
+  # See: https://github.com/ansible-community/molecule-plugins/tree/main/doc/vagrant.
+  name: vagrant
+  provider:
+    name: libvirt
+  cachier: machine
+  parallel: true
+
+lint: |
+  set -e
+  yamllint .
+  ansible-lint -x "name[missing]"
+
+platforms:
+  - name: instance
+    config_options:
+      # These options are for Vagrant, setting these is akin to setting options in a Vagrantfile.
+      # See: https://developer.hashicorp.com/vagrant/docs/vagrantfile/machine_settings (i.e., config.vm)
+      # See: https://developer.hashicorp.com/vagrant/docs/vagrantfile/ssh_settings (i.e., config.ssh)
+      # The SSH settings here are for use by *Vagrant* to access the machine, not by *Ansible*.
+      # Because we never use `vagrant ssh` when testing via Molecule, these SSH settings don't really matter.
+      ssh.remote_user: 'vagrant-ssh--not-applicable'
+      # Disable synced folders between the host and guest(s)
+      # https://developer.hashicorp.com/vagrant/docs/vagrantfile/machine_settings#config-vm-allow_fstab_modification
+      vm.allow_fstab_modification: false
+    box: debian/testing64
+    box_version: 20230226.1
+    memory: 2048
+    cpus: 1
+
+provisioner:
+  name: ansible
+  #env:
+    # Useful environment vars for debugging
+    #ANSIBLE_DEBUG: 1
+    #ANSIBLE_VERBOSITY: 3
+  inventory:
+    host_vars:
+      instance:
+        flatpaks_user: suzanne # See: https://en.wikipedia.org/wiki/Blender_(software)#Suzanne
+        flatpaks_user_xdg_config_home: "/home/{{ flatpaks_user }}/.config"
+        flatpaks_xdg_data_home: "/home/{{ flatpaks_user }}/.local/share"
+        flatpaks_system_flatpaks:
+          - com.github.tchx84.Flatseal
+        flatpaks_user_flatpaks:
+          - dev.zelikos.rollit
+
+  playbooks:
+    converge: ${MOLECULE_PLAYBOOK:-converge.yml}

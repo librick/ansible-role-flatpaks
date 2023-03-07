@@ -1,0 +1,59 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+  - name: Stat .local/share/flatpak directory.
+    ansible.builtin.stat:
+      path: "/home/{{ flatpaks_user }}/.local/share/flatpak"
+    become: true
+    become_user: "{{ flatpaks_user }}"
+    register: r_stat_local_flatpak_directory
+
+  - name: Assert .local/share/flatpak directory exists with correct permissions.
+    ansible.builtin.assert:
+      that:
+        - r_stat_local_flatpak_directory.stat.isdir is defined
+        - r_stat_local_flatpak_directory.stat.isdir
+        - r_stat_local_flatpak_directory.stat.gr_name is defined
+        - r_stat_local_flatpak_directory.stat.gr_name == "suzanne"
+        - r_stat_local_flatpak_directory.stat.pw_name is defined
+        - r_stat_local_flatpak_directory.stat.pw_name == "suzanne"
+        - r_stat_local_flatpak_directory.stat.mode == "0700"
+
+  - name: Stat flatpak app directory.
+    ansible.builtin.stat:
+      path: "/home/{{ flatpaks_user }}/.local/share/flatpak/app"
+    become: true
+    become_user: "{{ flatpaks_user }}"
+    register: r_stat_app_directory
+
+  - name: Assert flatpak app directory exists with correct permissions.
+    ansible.builtin.assert:
+      that:
+        - r_stat_app_directory.stat.isdir is defined
+        - r_stat_app_directory.stat.isdir
+        - r_stat_app_directory.stat.gr_name is defined
+        - r_stat_app_directory.stat.gr_name == "suzanne"
+        - r_stat_app_directory.stat.pw_name is defined
+        - r_stat_app_directory.stat.pw_name == "suzanne"
+        - r_stat_app_directory.stat.mode == "0755"
+
+  - name: Stat dev.zelikos.rollit directory.
+    ansible.builtin.stat:
+      path: "/home/{{ flatpaks_user }}/.local/share/flatpak/app/dev.zelikos.rollit"
+    become: true
+    become_user: "{{ flatpaks_user }}"
+    register: r_stat_rollit_directory
+
+  - name: Assert dev.zelikos.rollit directory exists with correct permissions.
+    ansible.builtin.assert:
+      that:
+        - r_stat_rollit_directory.stat.isdir is defined
+        - r_stat_rollit_directory.stat.isdir
+        - r_stat_rollit_directory.stat.gr_name is defined
+        - r_stat_rollit_directory.stat.gr_name == "suzanne"
+        - r_stat_rollit_directory.stat.pw_name is defined
+        - r_stat_rollit_directory.stat.pw_name == "suzanne"
+        - r_stat_rollit_directory.stat.mode == "0755"

@@ -1,0 +1,12 @@
+---
+- name: Debug; print user flatpaks to stdout.
+  ansible.builtin.debug:
+    msg: "Attempting to install user flatpaks: {{ flatpaks_user_flatpaks }}"
+
+- name: Install flatpak packages from flathub for the current user.
+  community.general.flatpak:
+    remote: "flathub"
+    name: "{{ flatpaks_user_flatpaks | default([]) }}"
+    method: user
+  become: true
+  become_user: "{{ flatpaks_user }}"

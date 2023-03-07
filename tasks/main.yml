@@ -1,0 +1,15 @@
+---
+- name: Import install flatpak tasks
+  ansible.builtin.import_tasks: 01-install-flatpak-from-apt.yml
+- name: Import flatpak system repo tasks
+  ansible.builtin.import_tasks: 02-install-system-repos.yml
+- name: Import flatpak user repo tasks
+  ansible.builtin.import_tasks: 03-install-user-repos.yml
+- name: Import install system flatpak tasks
+  ansible.builtin.import_tasks: 04-install-system-flatpaks.yml
+- name: Import install user flatpak tasks
+  ansible.builtin.import_tasks: 05-install-user-flatpaks.yml
+- name: Import auto-update user flatpaks tasks
+  ansible.builtin.import_tasks: 06-auto-updates-for-user.yml
+- name: Import desktop icon tasks
+  ansible.builtin.import_tasks: 99-refresh-desktop-icons.yml

@@ -1,0 +1,14 @@
+# Automate updates of flatpak packages
+# Written by Eric McDonald, MIT license
+# Inspired by/taken from https://www.jwillikers.com/automate-flatpak-updates-with-systemd
+# Should be installed to ~/.config/systemd/user/update-system-flatpaks.timer
+# See update-user-flatpaks.service
+[Unit]
+Description=Update user flatpaks weekly
+
+[Timer]
+OnCalendar=weekly
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,80 @@
+---
+# Part of systemd --user workaround
+# Otherwise we get "Failed to connect to bus: No such file or directory"
+# See: https://github.com/ansible/ansible/issues/50272
+- name: Read the flatpaks_user /etc/passwd entry using getent.
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ flatpaks_user }}"
+  become: true
+  become_user: root
+
+# Part of systemd --user workaround
+# Otherwise we get "Failed to connect to bus: No such file or directory"
+# See: https://github.com/ansible/ansible/issues/50272
+- name: Ensure dbus-user-session apt package is installed.
+  ansible.builtin.apt:
+    name: dbus-user-session
+    state: present
+  become: true
+  become_user: root
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ ansible_facts.getent_passwd[flatpaks_user][1] }}"
+
+# Part of systemd --user workaround
+# Otherwise we get "Failed to connect to bus: No such file or directory"
+# See: https://github.com/ansible/ansible/issues/50272
+- name: Ensure loginctl lingering is enabled for flatpaks_user
+  ansible.builtin.command:
+    cmd: loginctl enable-linger {{ ansible_facts.getent_passwd[flatpaks_user][1] }}
+  become: true
+  become_user: root
+  changed_when: false
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ ansible_facts.getent_passwd[flatpaks_user][1] }}"
+
+# Part of systemd --user workaround
+# Otherwise we get "Failed to connect to bus: No such file or directory"
+# See: https://github.com/ansible/ansible/issues/50272
+- name: Ensure systemd user daemon is reloaded
+  # Intentionally use `command` rather than the `systemd` built-in
+  # See: https://github.com/ansible/ansible/issues/65785
+  # noqa: command-instead-of-module
+  ansible.builtin.command:
+    cmd:  systemctl --user daemon-reload
+  become: true
+  become_user: "{{ flatpaks_user }}"
+  changed_when: false
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ ansible_facts.getent_passwd[flatpaks_user][1] }}"
+
+- name: Ensure systemd/user directory exists.
+  ansible.builtin.file:
+    path: "{{ flatpaks_xdg_config_home }}/systemd/user"
+    owner: "{{ flatpaks_user }}"
+    group: "{{ flatpaks_user }}"
+    mode: 0755
+    state: directory
+  become: true
+  become_user: "{{ flatpaks_user }}"
+
+- name: Ensure update-user-flatpaks.timer file is in place.
+  ansible.builtin.copy:
+    src: update-user-flatpaks.service
+    dest: "{{ flatpaks_xdg_config_home }}/systemd/user/update-user-flatpaks.timer"
+    owner: "{{ flatpaks_user }}"
+    group: "{{ flatpaks_user }}"
+    mode: 0644
+  become: true
+  become_user: "{{ flatpaks_user }}"
+
+- name: Ensure update-user-flatpaks.service file is in place.
+  ansible.builtin.copy:
+    src: update-user-flatpaks.service
+    dest: "{{ flatpaks_xdg_config_home }}/systemd/user/update-user-flatpaks.service"
+    owner: "{{ flatpaks_user }}"
+    group: "{{ flatpaks_user }}"
+    mode: 0644
+  become: true
+  become_user: "{{ flatpaks_user }}"
+  notify: Restart update-user-flatpaks service for user.

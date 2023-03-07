@@ -1,0 +1,45 @@
+---
+# converge.yml is the playbook file that contains the call for your role.
+# Molecule will invoke this playbook with ansible-playbook and run it against an instance created by the driver.
+# See: https://molecule.readthedocs.io/en/latest/getting-started/#the-scenario-layout
+- name: Converge
+  hosts: all
+  gather_facts: false
+
+  pre_tasks:
+    - name: Update apt cache.
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 600
+      changed_when: false
+      become: true
+
+    - name: Debug; print flatpaks_user.
+      ansible.builtin.debug:
+        msg: "Installing/configuring flatpaks for user with username \"{{ flatpaks_user }}\""
+
+    - name: Debug; print flatpaks_xdg_config_home.
+      ansible.builtin.debug:
+        msg: "Installing/configuring flatpaks with XDG_CONFIG_HOME={{ flatpaks_xdg_config_home }}"
+
+    - name: Debug; print flatpaks_xdg_data_home.
+      ansible.builtin.debug:
+        msg: "Installing/configuring flatpaks with XDG_DATA_HOME={{ flatpaks_xdg_data_home  }}"
+
+    - name: Ensure flatpaks_user group exists.
+      ansible.builtin.group:
+        name: "{{ flatpaks_user }}"
+      become: true
+      become_user: root
+
+    - name: Ensure flatpaks_user user exists.
+      ansible.builtin.user:
+        name: "{{ flatpaks_user }}"
+        append: true
+        group: "{{ flatpaks_user }}"
+        groups: "{{ flatpaks_user }}"
+      become: true
+      become_user: root
+
+  roles:
+    - role: librick.flatpaks

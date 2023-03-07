@@ -1,0 +1,16 @@
+# The username of the user for which flatpaks will be installed
+flatpaks_user: "{{ ansible_user }}"
+# The value with which to populate the $XDG_CONFIG_HOME environment variable
+# when installing flatpaks for the user specified by flatpaks_user
+# See: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+flatpaks_xdg_config_home: "/home/{{ flatpaks_user }}/.config"
+# The value with which to populate the $XDG_DATA_HOME environment variable
+# when installing flatpaks for the user specified by flatpaks_user
+flatpaks_xdg_data_home: "/home/{{ flatpaks_user }}/.local/share"
+# flatpaks to install system-wide, using FQDN-style package names
+flatpaks_system_flatpaks:
+  - com.github.tchx84.Flatseal
+# flatpaks to install as the flatpaks_user, using FQDN-style package names
+flatpaks_user_flatpaks:
+  - im.riot.Riot
+  - cc.arduino.IDE2

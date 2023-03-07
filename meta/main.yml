@@ -1,0 +1,17 @@
+---
+dependencies: []
+
+galaxy_info:
+  role_name: flatpaks
+  author: librick
+  description: Flatpak and flatpak package installation with automatic updates.
+  license: "MIT"
+  min_ansible_version: "2.14.1"
+  platforms:
+    - name: Debian
+      versions:
+        - all
+  galaxy_tags:
+    - flatpak
+    - automatic
+    - updates

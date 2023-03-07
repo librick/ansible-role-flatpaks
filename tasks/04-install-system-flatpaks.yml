@@ -1,0 +1,11 @@
+---
+- name: Debug; print system flatpaks to stdout.
+  ansible.builtin.debug:
+    msg: "Attempting to install system flatpaks: {{ flatpaks_system_flatpaks }}"
+
+- name: Install flatpak packages from flathub system-wide as root.
+  community.general.flatpak:
+    remote: "flathub"
+    name: "{{ flatpaks_system_flatpaks | default([]) }}"
+  become: true
+  become_user: root

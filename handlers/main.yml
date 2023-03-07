@@ -1,0 +1,17 @@
+---
+- name: Restart update-user-flatpaks service for user.
+  ansible.builtin.systemd:
+    name: update-user-flatpaks
+    enabled: true
+    scope: user
+    state: restarted
+  become: true
+  become_user: "{{ flatpaks_user }}"
+  environment:
+    # If XDG_RUNTIME_DIR is not specified, calls to systemd with `--user` fail
+    # with the message "Failed to connect to bus: No such file or directory".
+    # The following XDG_RUNTIME_DIR assignment is a workaround.
+    # XDG_RUNTIME_DIR is eventually set to /run/user/<the-user-id-of-flatpaks-user>
+    # See: https://github.com/ansible/ansible/issues/50272
+    # See: https://askubuntu.com/questions/1007055/systemctl-edit-problem-failed-to-connect-to-bus
+    XDG_RUNTIME_DIR: "/run/user/{{ ansible_facts.getent_passwd[flatpaks_user][1] }}"

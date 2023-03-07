@@ -1,0 +1,23 @@
+---
+# The xdg-utils apt package includes the xdg-desktop-menu binary,
+# used to refresh desktop icons 
+- name: Ensure xdg-utils apt package is installed.
+  ansible.builtin.apt:
+    name: xdg-utils
+    state: present
+  become: true
+  become_user: root
+
+- name: Refresh XDG desktop menu.
+  ansible.builtin.command:
+    cmd: xdg-desktop-menu forceupdate
+  become: true
+  become_user: "{{ flatpaks_user }}"
+  changed_when: false
+
+- name: Refresh desktop database.
+  ansible.builtin.command:
+    cmd: update-desktop-database {{ flatpaks_xdg_data_home }}/flatpak/exports/share/applications/
+  become: true
+  become_user: "{{ flatpaks_user }}"
+  changed_when: false

@@ -1,0 +1,19 @@
+---
+- name: Ensure flatpak apt package is installed.
+  ansible.builtin.apt:
+    name: flatpak
+    state: present
+  become: true
+  become_user: root
+
+# The acl apt package includes the setfacl binary
+# which is required by Ansible to handle permissions when using
+# become_user with non-root users.
+# See: https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_privilege_escalation.html#risks-of-becoming-an-unprivileged-user.
+# See: https://packages.debian.org/sid/acl
+- name: Ensure acl apt package is installed.
+  ansible.builtin.apt:
+    name: acl
+    state: present
+  become: true
+  become_user: root

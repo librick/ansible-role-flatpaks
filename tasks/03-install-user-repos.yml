@@ -1,0 +1,9 @@
+---
+- name: Ensure flathub repo remote exists in user installation.
+  community.general.flatpak_remote:
+    flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
+    name: flathub
+    method: user
+    state: present
+  become: true
+  become_user: "{{ flatpaks_user }}"
